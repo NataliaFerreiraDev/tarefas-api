@@ -4,8 +4,8 @@ import br.com.tarefas_api.domain.Categoria;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * Repositório para acesso à entidade Categoria no banco de dados.
+ * Repositório responsável pelas operações CRUD na entidade Categoria.
  */
-public interface CategoriaRepository  extends JpaRepository<Categoria, Long> {
+public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
 
 }

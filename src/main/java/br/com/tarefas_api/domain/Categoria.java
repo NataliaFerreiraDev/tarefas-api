@@ -2,17 +2,23 @@ package br.com.tarefas_api.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 /**
  * Representa uma categoria de itens na lista de tarefas.
  */
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "categoria")
-@Schema(description = "Entidade que representa uma categoria de itens.")
+@Schema(description = "Entidade que representa uma categoria.")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Categoria {
 
     /**
@@ -27,11 +33,14 @@ public class Categoria {
      * Nome da categoria. Deve ser único e não pode ser nulo.
      */
     @Column(unique = true, nullable = false, length = 100)
-    @Schema(description = "Nome da categoria.", example = "Trabalho")
+    @Schema(description = "Nome da categoria. Deve ser único.", example = "Trabalho")
     private String nome;
 
     /**
      * Lista de itens associados a esta categoria.
+     * Relacionamento bidirecional mapeado pelo atributo 'categoria' em Item.
+     * CascadeType.ALL garante que a exclusão de uma categoria remova os itens associados.
+     * FetchType.LAZY evita carregamento desnecessário dos itens ao buscar categorias.
      */
     @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Schema(description = "Lista de itens pertencentes a esta categoria.")

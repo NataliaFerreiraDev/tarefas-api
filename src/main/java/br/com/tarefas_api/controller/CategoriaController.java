@@ -7,10 +7,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 /**
@@ -38,6 +37,60 @@ public class CategoriaController {
     public ResponseEntity<CategoriaDTO> criarCategoria(@Valid @RequestBody CategoriaDTO categoriaDTO) {
         CategoriaDTO novaCategoria = categoriaService.criarCategoria(categoriaDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(novaCategoria);
+    }
+
+    /**
+     * Lista todas as categorias.
+     *
+     * @return ResponseEntity com a lista de categorias e status 200 (OK).
+     */
+    @GetMapping
+    @Operation(summary = "Listar todas as categorias", description = "Retorna todas as categorias cadastradas.")
+    public ResponseEntity<List<CategoriaDTO>> listarCategorias() {
+        List<CategoriaDTO> categorias = categoriaService.listarCategorias();
+        return ResponseEntity.ok(categorias);
+    }
+
+    /**
+     * Busca uma categoria pelo ID.
+     *
+     * @param id Identificador da categoria.
+     * @return ResponseEntity com o DTO da categoria e status 200 (OK).
+     */
+    @GetMapping("/{id}")
+    @Operation(summary = "Buscar categoria por ID", description = "Retorna uma categoria específica com base no ID informado.")
+    public ResponseEntity<CategoriaDTO> buscarCategoriaPorId(@PathVariable Long id) {
+        CategoriaDTO categoriaDTO = categoriaService.buscarCategoriaPorId(id);
+        return ResponseEntity.ok(categoriaDTO);
+    }
+
+    /**
+     * Atualiza uma categoria existente pelo ID.
+     *
+     * @param id           Identificador da categoria a ser atualizada.
+     * @param categoriaDTO DTO com os novos dados da categoria.
+     * @return ResponseEntity com o DTO da categoria atualizada e status 200 (OK).
+     */
+    @PutMapping("/{id}")
+    @Operation(summary = "Atualizar categoria por ID", description = "Atualiza os dados de uma categoria existente.")
+    public ResponseEntity<CategoriaDTO> atualizarCategoria(
+            @PathVariable Long id,
+            @Valid @RequestBody CategoriaDTO categoriaDTO) {
+        CategoriaDTO categoriaAtualizada = categoriaService.atualizarCategoria(id, categoriaDTO);
+        return ResponseEntity.ok(categoriaAtualizada);
+    }
+
+    /**
+     * Exclui uma categoria pelo ID.
+     *
+     * @param id Identificador da categoria a ser excluída.
+     * @return ResponseEntity com status 204 (No Content) em caso de sucesso.
+     */
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Excluir categoria por ID", description = "Remove uma categoria existente pelo seu identificador.")
+    public ResponseEntity<Void> excluirCategoria(@PathVariable Long id) {
+        categoriaService.excluirCategoria(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

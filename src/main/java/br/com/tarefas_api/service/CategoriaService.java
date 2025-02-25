@@ -2,6 +2,7 @@ package br.com.tarefas_api.service;
 
 import br.com.tarefas_api.domain.Categoria;
 import br.com.tarefas_api.dto.CategoriaDTO;
+import br.com.tarefas_api.exception.CategoriaNaoEncontradaException;
 import br.com.tarefas_api.repository.CategoriaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,8 +15,6 @@ import java.util.List;
  */
 @Service
 public class CategoriaService {
-
-    private static final String CATEGORIA_NAO_ENCONTRADA = "Categoria não encontrada com ID: ";
 
     private final CategoriaRepository categoriaRepository;
 
@@ -62,7 +61,7 @@ public class CategoriaService {
     @Transactional(readOnly = true)
     public CategoriaDTO buscarCategoriaPorId(Long id) {
         Categoria categoria = categoriaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(CATEGORIA_NAO_ENCONTRADA + id));
+                .orElseThrow(() -> new CategoriaNaoEncontradaException(id));
 
         return new CategoriaDTO(categoria.getNome());
     }
@@ -78,7 +77,7 @@ public class CategoriaService {
     @Transactional
     public CategoriaDTO atualizarCategoria(Long id, CategoriaDTO categoriaDTO) {
         Categoria categoria = categoriaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(CATEGORIA_NAO_ENCONTRADA + id));
+                .orElseThrow(() -> new CategoriaNaoEncontradaException(id));
 
         categoria.setNome(categoriaDTO.getNome());
         Categoria categoriaAtualizada = categoriaRepository.save(categoria);
@@ -95,7 +94,7 @@ public class CategoriaService {
     @Transactional
     public void excluirCategoria(Long id) {
         Categoria categoria = categoriaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(CATEGORIA_NAO_ENCONTRADA + id));
+                .orElseThrow(() -> new CategoriaNaoEncontradaException(id));
 
         categoriaRepository.delete(categoria);
     }

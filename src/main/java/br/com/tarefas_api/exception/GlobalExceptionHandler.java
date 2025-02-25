@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Classe global para tratamento de exceções da API.
@@ -20,17 +22,16 @@ public class GlobalExceptionHandler {
      * @return ResponseEntity com detalhes do erro e status apropriado.
      */
     @ExceptionHandler(CategoriaException.class)
-    public ResponseEntity<ErroResponse> handleCategoriaException(CategoriaException ex) {
+    public ResponseEntity<Object> handleCategoriaException(CategoriaException ex) {
         HttpStatus status = (ex instanceof CategoriaNaoEncontradaException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST;
 
-        ErroResponse erroResponse = new ErroResponse(
-                LocalDateTime.now(),
-                status.value(),
-                "Erro de Categoria",
-                ex.getMessage()
-        );
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", status.value());
+        body.put("error", "Erro de Categoria");
+        body.put("message", ex.getMessage());
 
-        return ResponseEntity.status(status).body(erroResponse);
+        return ResponseEntity.status(status).body(body);
     }
 
 }

@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
+@Builder
 @Table(name = "item")
 @Schema(description = "Entidade que representa um item dentro de uma categoria.")
 @AllArgsConstructor

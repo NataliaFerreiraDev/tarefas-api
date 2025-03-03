@@ -4,7 +4,7 @@ import br.com.tarefas_api.domain.Item;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * Repositório para acesso à entidade Item no banco de dados.
+ * Repositório responsável pelas operações CRUD na entidade Item.
  */
 public interface ItemRepository extends JpaRepository<Item, Long> {
 

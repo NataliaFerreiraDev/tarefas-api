@@ -3,6 +3,7 @@ package br.com.tarefas_api.service;
 import br.com.tarefas_api.domain.Categoria;
 import br.com.tarefas_api.dto.CategoriaDTO;
 import br.com.tarefas_api.exception.CategoriaComItensException;
+import br.com.tarefas_api.exception.CategoriaJaExisteException;
 import br.com.tarefas_api.exception.CategoriaNaoEncontradaException;
 import br.com.tarefas_api.repository.CategoriaRepository;
 import br.com.tarefas_api.repository.ItemRepository;
@@ -26,13 +27,15 @@ public class CategoriaService {
     }
 
     /**
-     * Cria uma nova categoria.
+     * Cria uma nova categoria, garantindo que o nome seja único.
      *
      * @param categoriaDTO DTO com os dados da categoria.
      * @return DTO da categoria criada.
      */
     @Transactional
     public CategoriaDTO criarCategoria(CategoriaDTO categoriaDTO) {
+        validarNomeUnico(categoriaDTO.getNome(), null);
+
         Categoria categoria = converterParaEntidade(categoriaDTO);
         Categoria salva = categoriaRepository.save(categoria);
         return converterParaDTO(salva);
@@ -64,7 +67,7 @@ public class CategoriaService {
     }
 
     /**
-     * Atualiza uma categoria existente pelo ID.
+     * Atualiza uma categoria existente pelo ID, garantindo nome único.
      * Só pode ser alterada se **não houver itens associados**.
      *
      * @param id ID da categoria.
@@ -75,6 +78,7 @@ public class CategoriaService {
     public CategoriaDTO atualizarCategoria(Long id, CategoriaDTO categoriaDTO) {
         Categoria categoria = buscarCategoria(id);
         validarCategoriaSemItens(id);
+        validarNomeUnico(categoriaDTO.getNome(), id);
 
         categoria.setNome(categoriaDTO.getNome());
         Categoria atualizada = categoriaRepository.save(categoria);
@@ -94,6 +98,17 @@ public class CategoriaService {
         validarCategoriaSemItens(id);
 
         categoriaRepository.delete(categoria);
+    }
+
+    /**
+     * Verifica se já existe uma categoria com o mesmo nome.
+     */
+    private void validarNomeUnico(String nome, Long idAtual) {
+        categoriaRepository.findByNome(nome).ifPresent(categoria -> {
+            if (!categoria.getId().equals(idAtual)) {
+                throw new CategoriaJaExisteException(nome);
+            }
+        });
     }
 
     /**

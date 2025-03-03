@@ -9,10 +9,14 @@ import java.time.LocalDateTime;
 /**
  * Representa um item dentro de uma categoria.
  */
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "item")
 @Schema(description = "Entidade que representa um item dentro de uma categoria.")
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString(exclude = "categoria")
 public class Item {
 
     /**
@@ -24,7 +28,7 @@ public class Item {
     private Long id;
 
     /**
-     * Descrição do item.
+     * Descrição do item. Não pode ser nula.
      */
     @Column(nullable = false)
     @Schema(description = "Descrição do item.", example = "Enviar relatório mensal")
@@ -45,11 +49,11 @@ public class Item {
     private LocalDateTime dataLimite;
 
     /**
-     * Data de criação do item. Definida automaticamente.
+     * Data de criação do item. Definida automaticamente na inserção.
      */
     @Column(nullable = false, updatable = false)
     @Schema(description = "Data de criação do item.", example = "2024-02-21T10:00:00")
-    private LocalDateTime dataCriacao = LocalDateTime.now();
+    private LocalDateTime dataCriacao;
 
     /**
      * Categoria à qual o item pertence.
@@ -58,5 +62,13 @@ public class Item {
     @JoinColumn(name = "categoria_id", nullable = false)
     @Schema(description = "Categoria associada ao item.")
     private Categoria categoria;
+
+    /**
+     * Define automaticamente a data de criação antes de salvar no banco.
+     */
+    @PrePersist
+    protected void prePersist() {
+        this.dataCriacao = LocalDateTime.now();
+    }
 
 }

@@ -8,4 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
+    /**
+     * Verifica se existe pelo menos um item associado a uma determinada categoria.
+     */
+    boolean existsByCategoriaId(Long id);
+
 }

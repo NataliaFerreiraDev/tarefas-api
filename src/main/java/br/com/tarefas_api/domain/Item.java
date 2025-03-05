@@ -39,6 +39,7 @@ public class Item {
      * Indica se o item foi concluído.
      */
     @Column(nullable = false)
+    @Builder.Default
     @Schema(description = "Indica se o item foi concluído.", example = "false")
     private Boolean concluido = false;
 

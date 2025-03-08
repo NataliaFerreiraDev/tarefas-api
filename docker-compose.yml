@@ -1,0 +1,36 @@
+services:
+  tarefas-api:
+    build: .
+    container_name: tarefas-api
+    ports:
+      - "8081:8081"  # Mudamos para 8081 para evitar conflito
+    depends_on:
+      - postgres-tarefas
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-tarefas:5432/tarefas
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 123456
+    networks:
+      - tarefas-network
+
+  postgres-tarefas:
+    image: postgres:15
+    container_name: postgres-tarefas
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: tarefas
+    ports:
+      - "5433:5432"  # Porta diferente para evitar conflito
+    volumes:
+      - tarefas-data:/var/lib/postgresql/data
+    networks:
+      - tarefas-network
+
+volumes:
+  tarefas-data:
+
+networks:
+  tarefas-network:
+    driver: bridge

@@ -26,7 +26,7 @@ public class Categoria {
      * Identificador único da categoria.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Schema(description = "ID único da categoria.", example = "1")
     private UUID id;
 

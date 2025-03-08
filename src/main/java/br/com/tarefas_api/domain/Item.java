@@ -25,7 +25,7 @@ public class Item {
      * Identificador único do item.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Schema(description = "ID único do item.", example = "1")
     private UUID id;
 

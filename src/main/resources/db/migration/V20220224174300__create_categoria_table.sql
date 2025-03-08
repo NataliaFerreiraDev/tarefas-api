@@ -1,5 +1,5 @@
 -- Criação da tabela categoria
 CREATE TABLE categoria (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     nome VARCHAR(100) UNIQUE NOT NULL
 );

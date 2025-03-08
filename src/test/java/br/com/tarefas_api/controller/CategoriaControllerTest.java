@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -29,9 +30,12 @@ class CategoriaControllerTest {
 
     private CategoriaDTO categoriaDTO;
 
+    private UUID categoriaId;
+
     @BeforeEach
     void setUp() {
         categoriaDTO = new CategoriaDTO("Trabalho");
+        categoriaId = UUID.randomUUID();
     }
 
     @Test
@@ -58,9 +62,9 @@ class CategoriaControllerTest {
 
     @Test
     void deveBuscarCategoriaPorId() {
-        when(categoriaService.buscarCategoriaPorId(1L)).thenReturn(categoriaDTO);
+        when(categoriaService.buscarCategoriaPorId(categoriaId)).thenReturn(categoriaDTO);
 
-        ResponseEntity<CategoriaDTO> response = categoriaController.buscarCategoriaPorId(1L);
+        ResponseEntity<CategoriaDTO> response = categoriaController.buscarCategoriaPorId(categoriaId);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(categoriaDTO, response.getBody());
@@ -68,9 +72,9 @@ class CategoriaControllerTest {
 
     @Test
     void deveAtualizarCategoria() {
-        when(categoriaService.atualizarCategoria(eq(1L), any(CategoriaDTO.class))).thenReturn(categoriaDTO);
+        when(categoriaService.atualizarCategoria(eq(categoriaId), any(CategoriaDTO.class))).thenReturn(categoriaDTO);
 
-        ResponseEntity<CategoriaDTO> response = categoriaController.atualizarCategoria(1L, categoriaDTO);
+        ResponseEntity<CategoriaDTO> response = categoriaController.atualizarCategoria(categoriaId, categoriaDTO);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(categoriaDTO, response.getBody());
@@ -78,12 +82,12 @@ class CategoriaControllerTest {
 
     @Test
     void deveExcluirCategoria() {
-        doNothing().when(categoriaService).excluirCategoria(1L);
+        doNothing().when(categoriaService).excluirCategoria(categoriaId);
 
-        ResponseEntity<Void> response = categoriaController.excluirCategoria(1L);
+        ResponseEntity<Void> response = categoriaController.excluirCategoria(categoriaId);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        verify(categoriaService, times(1)).excluirCategoria(1L);
+        verify(categoriaService, times(1)).excluirCategoria(categoriaId);
     }
 
 }

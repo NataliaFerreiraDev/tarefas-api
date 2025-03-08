@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -34,12 +35,17 @@ class CategoriaServiceTest {
     private ItemRepository itemRepository;
 
     private Categoria categoria;
+
     private CategoriaDTO categoriaDTO;
+
+    private UUID categoriaId;
 
     @BeforeEach
     void setUp() {
+        categoriaId = UUID.randomUUID();
+
         categoria = new Categoria();
-        categoria.setId(1L);
+        categoria.setId(categoriaId);
         categoria.setNome("Trabalho");
 
         categoriaDTO = new CategoriaDTO("Trabalho");
@@ -84,9 +90,9 @@ class CategoriaServiceTest {
 
     @Test
     void deveBuscarCategoriaPorIdComSucesso() {
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
 
-        CategoriaDTO resultado = categoriaService.buscarCategoriaPorId(1L);
+        CategoriaDTO resultado = categoriaService.buscarCategoriaPorId(categoriaId);
 
         assertThat(resultado).isNotNull();
         assertThat(resultado.getNome()).isEqualTo("Trabalho");
@@ -94,22 +100,22 @@ class CategoriaServiceTest {
 
     @Test
     void deveLancarExcecaoQuandoCategoriaNaoEncontrada() {
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.empty());
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> categoriaService.buscarCategoriaPorId(1L))
+        assertThatThrownBy(() -> categoriaService.buscarCategoriaPorId(categoriaId))
                 .isInstanceOf(CategoriaNaoEncontradaException.class)
-                .hasMessage("Categoria não encontrada com ID: 1");
+                .hasMessage("Categoria não encontrada com ID: " + categoriaId);
     }
 
     @Test
     void deveAtualizarCategoriaComSucesso() {
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-        when(itemRepository.existsByCategoriaId(1L)).thenReturn(false);
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+        when(itemRepository.existsByCategoriaId(categoriaId)).thenReturn(false);
         when(categoriaRepository.findByNome("Trabalho Atualizado")).thenReturn(Optional.empty());
         when(categoriaRepository.save(any())).thenReturn(categoria);
 
         CategoriaDTO atualizadoDTO = new CategoriaDTO("Trabalho Atualizado");
-        CategoriaDTO resultado = categoriaService.atualizarCategoria(1L, atualizadoDTO);
+        CategoriaDTO resultado = categoriaService.atualizarCategoria(categoriaId, atualizadoDTO);
 
         assertThat(resultado.getNome()).isEqualTo("Trabalho Atualizado");
         verify(categoriaRepository).save(any());
@@ -117,61 +123,61 @@ class CategoriaServiceTest {
 
     @Test
     void deveLancarExcecaoAoAtualizarCategoriaInexistente() {
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.empty());
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> categoriaService.atualizarCategoria(1L, categoriaDTO))
+        assertThatThrownBy(() -> categoriaService.atualizarCategoria(categoriaId, categoriaDTO))
                 .isInstanceOf(CategoriaNaoEncontradaException.class);
     }
 
     @Test
     void deveLancarExcecaoAoAtualizarCategoriaJaExistente() {
         Categoria outraCategoria = new Categoria();
-        outraCategoria.setId(2L);
+        outraCategoria.setId(UUID.randomUUID());
         outraCategoria.setNome("Outra");
 
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-        when(itemRepository.existsByCategoriaId(1L)).thenReturn(false);
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+        when(itemRepository.existsByCategoriaId(categoriaId)).thenReturn(false);
         when(categoriaRepository.findByNome("Outra")).thenReturn(Optional.of(outraCategoria));
 
         CategoriaDTO novaCategoriaDTO = new CategoriaDTO("Outra");
 
-        assertThatThrownBy(() -> categoriaService.atualizarCategoria(1L, novaCategoriaDTO))
+        assertThatThrownBy(() -> categoriaService.atualizarCategoria(categoriaId, novaCategoriaDTO))
                 .isInstanceOf(CategoriaJaExisteException.class);
     }
 
     @Test
     void deveLancarExcecaoAoAtualizarCategoriaComItens() {
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-        when(itemRepository.existsByCategoriaId(1L)).thenReturn(true);
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+        when(itemRepository.existsByCategoriaId(categoriaId)).thenReturn(true);
 
-        assertThatThrownBy(() -> categoriaService.atualizarCategoria(1L, categoriaDTO))
+        assertThatThrownBy(() -> categoriaService.atualizarCategoria(categoriaId, categoriaDTO))
                 .isInstanceOf(CategoriaComItensException.class);
     }
 
     @Test
     void deveExcluirCategoriaComSucesso() {
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-        when(itemRepository.existsByCategoriaId(1L)).thenReturn(false);
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+        when(itemRepository.existsByCategoriaId(categoriaId)).thenReturn(false);
 
-        categoriaService.excluirCategoria(1L);
+        categoriaService.excluirCategoria(categoriaId);
 
         verify(categoriaRepository).delete(categoria);
     }
 
     @Test
     void deveLancarExcecaoAoExcluirCategoriaInexistente() {
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.empty());
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> categoriaService.excluirCategoria(1L))
+        assertThatThrownBy(() -> categoriaService.excluirCategoria(categoriaId))
                 .isInstanceOf(CategoriaNaoEncontradaException.class);
     }
 
     @Test
     void deveLancarExcecaoAoExcluirCategoriaComItens() {
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-        when(itemRepository.existsByCategoriaId(1L)).thenReturn(true);
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+        when(itemRepository.existsByCategoriaId(categoriaId)).thenReturn(true);
 
-        assertThatThrownBy(() -> categoriaService.excluirCategoria(1L))
+        assertThatThrownBy(() -> categoriaService.excluirCategoria(categoriaId))
                 .isInstanceOf(CategoriaComItensException.class);
     }
 

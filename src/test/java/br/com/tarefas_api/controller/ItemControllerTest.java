@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -27,14 +28,20 @@ class ItemControllerTest {
 
     private ItemDTO itemDTO;
 
+    private UUID itemId;
+
+    private UUID categoriaId;
+
     @BeforeEach
     void setUp() {
+        categoriaId = UUID.randomUUID();
+        itemId = UUID.randomUUID();
+
         itemDTO = ItemDTO.builder()
-                .categoriaId(1L)
                 .descricao("Finalizar relatório")
                 .concluido(false)
                 .dataLimite(java.time.LocalDateTime.now())
-                .categoriaId(1L)
+                .categoriaId(categoriaId)
                 .build();
     }
 
@@ -63,34 +70,34 @@ class ItemControllerTest {
 
     @Test
     void buscarItemPorId_DeveRetornarItem() {
-        when(itemService.buscarPorId(1L)).thenReturn(itemDTO);
+        when(itemService.buscarPorId(itemId)).thenReturn(itemDTO);
 
-        ResponseEntity<ItemDTO> response = itemController.buscarItemPorId(1L);
+        ResponseEntity<ItemDTO> response = itemController.buscarItemPorId(itemId);
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(itemDTO, response.getBody());
-        verify(itemService, times(1)).buscarPorId(1L);
+        verify(itemService, times(1)).buscarPorId(itemId);
     }
 
     @Test
     void atualizarItem_DeveRetornarItemAtualizado() {
-        when(itemService.atualizarItem(eq(1L), any(ItemDTO.class))).thenReturn(itemDTO);
+        when(itemService.atualizarItem(eq(itemId), any(ItemDTO.class))).thenReturn(itemDTO);
 
-        ResponseEntity<ItemDTO> response = itemController.atualizarItem(1L, itemDTO);
+        ResponseEntity<ItemDTO> response = itemController.atualizarItem(itemId, itemDTO);
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(itemDTO, response.getBody());
-        verify(itemService, times(1)).atualizarItem(eq(1L), any(ItemDTO.class));
+        verify(itemService, times(1)).atualizarItem(eq(itemId), any(ItemDTO.class));
     }
 
     @Test
     void deletarItem_DeveRetornarNoContent() {
-        doNothing().when(itemService).removerItem(1L);
+        doNothing().when(itemService).removerItem(itemId);
 
-        ResponseEntity<Void> response = itemController.deletarItem(1L);
+        ResponseEntity<Void> response = itemController.deletarItem(itemId);
 
         assertEquals(204, response.getStatusCode().value());
-        verify(itemService, times(1)).removerItem(1L);
+        verify(itemService, times(1)).removerItem(itemId);
     }
 
 }

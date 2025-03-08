@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -35,14 +36,23 @@ class ItemServiceTest {
     private ItemService itemService;
 
     private Item item;
+
     private ItemDTO itemDTO;
+
     private Categoria categoria;
+
+    private UUID categoriaId;
+
+    private UUID itemId;
 
     @BeforeEach
     void setUp() {
-        categoria = new Categoria(1L, "Trabalho", new ArrayList<>());
+        categoriaId = UUID.randomUUID();
+        itemId = UUID.randomUUID();
+
+        categoria = new Categoria(categoriaId, "Trabalho", new ArrayList<>());
         item = Item.builder()
-                .id(1L)
+                .id(itemId)
                 .descricao("Finalizar relatório")
                 .concluido(false)
                 .dataLimite(LocalDate.of(2025, 12, 31).atStartOfDay())
@@ -53,13 +63,13 @@ class ItemServiceTest {
                 .descricao("Finalizar relatório")
                 .concluido(false)
                 .dataLimite(LocalDate.of(2025, 12, 31).atStartOfDay())
-                .categoriaId(1L)
+                .categoriaId(categoriaId)
                 .build();
     }
 
     @Test
     void criarItem_DeveCriarItemComSucesso() {
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
         when(itemRepository.save(any(Item.class))).thenReturn(item);
 
         ItemDTO resultado = itemService.criarItem(itemDTO);
@@ -71,18 +81,18 @@ class ItemServiceTest {
 
     @Test
     void criarItem_DeveLancarExcecao_QuandoCategoriaNaoExiste() {
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.empty());
+        when(categoriaRepository.findById(itemDTO.getCategoriaId())).thenReturn(Optional.empty());
 
         assertThrows(CategoriaNaoEncontradaException.class, () -> itemService.criarItem(itemDTO));
     }
 
     @Test
     void atualizarItem_DeveAtualizarComSucesso() {
-        when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
         when(itemRepository.save(any(Item.class))).thenReturn(item);
 
-        ItemDTO resultado = itemService.atualizarItem(1L, itemDTO);
+        ItemDTO resultado = itemService.atualizarItem(itemId, itemDTO);
 
         assertNotNull(resultado);
         assertEquals(itemDTO.getDescricao(), resultado.getDescricao());
@@ -91,9 +101,9 @@ class ItemServiceTest {
 
     @Test
     void atualizarItem_DeveLancarExcecao_QuandoItemNaoExiste() {
-        when(itemRepository.findById(1L)).thenReturn(Optional.empty());
+        when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
 
-        assertThrows(ItemNaoEncontradoException.class, () -> itemService.atualizarItem(1L, itemDTO));
+        assertThrows(ItemNaoEncontradoException.class, () -> itemService.atualizarItem(itemId, itemDTO));
     }
 
     @Test
@@ -108,9 +118,9 @@ class ItemServiceTest {
 
     @Test
     void buscarPorId_DeveRetornarItem() {
-        when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
 
-        ItemDTO resultado = itemService.buscarPorId(1L);
+        ItemDTO resultado = itemService.buscarPorId(itemId);
 
         assertNotNull(resultado);
         assertEquals(item.getDescricao(), resultado.getDescricao());
@@ -118,25 +128,25 @@ class ItemServiceTest {
 
     @Test
     void buscarPorId_DeveLancarExcecao_QuandoItemNaoExiste() {
-        when(itemRepository.findById(1L)).thenReturn(Optional.empty());
+        when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
 
-        assertThrows(ItemNaoEncontradoException.class, () -> itemService.buscarPorId(1L));
+        assertThrows(ItemNaoEncontradoException.class, () -> itemService.buscarPorId(itemId));
     }
 
     @Test
     void removerItem_DeveRemoverComSucesso() {
-        when(itemRepository.existsById(1L)).thenReturn(true);
-        doNothing().when(itemRepository).deleteById(1L);
+        when(itemRepository.existsById(itemId)).thenReturn(true);
+        doNothing().when(itemRepository).deleteById(itemId);
 
-        assertDoesNotThrow(() -> itemService.removerItem(1L));
-        verify(itemRepository).deleteById(1L);
+        assertDoesNotThrow(() -> itemService.removerItem(itemId));
+        verify(itemRepository).deleteById(itemId);
     }
 
     @Test
     void removerItem_DeveLancarExcecao_QuandoItemNaoExiste() {
-        when(itemRepository.existsById(1L)).thenReturn(false);
+        when(itemRepository.existsById(itemId)).thenReturn(false);
 
-        assertThrows(ItemNaoEncontradoException.class, () -> itemService.removerItem(1L));
+        assertThrows(ItemNaoEncontradoException.class, () -> itemService.removerItem(itemId));
     }
 
 }

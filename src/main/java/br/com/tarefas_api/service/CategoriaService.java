@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Serviço para gerenciamento de categorias.
@@ -61,7 +62,7 @@ public class CategoriaService {
      * @return DTO da categoria encontrada.
      */
     @Transactional(readOnly = true)
-    public CategoriaDTO buscarCategoriaPorId(Long id) {
+    public CategoriaDTO buscarCategoriaPorId(UUID id) {
         Categoria categoria = buscarCategoria(id);
         return converterParaDTO(categoria);
     }
@@ -75,7 +76,7 @@ public class CategoriaService {
      * @return DTO da categoria atualizada.
      */
     @Transactional
-    public CategoriaDTO atualizarCategoria(Long id, CategoriaDTO categoriaDTO) {
+    public CategoriaDTO atualizarCategoria(UUID id, CategoriaDTO categoriaDTO) {
         Categoria categoria = buscarCategoria(id);
         validarCategoriaSemItens(id);
         validarNomeUnico(categoriaDTO.getNome(), id);
@@ -93,7 +94,7 @@ public class CategoriaService {
      * @param id ID da categoria a ser removida.
      */
     @Transactional
-    public void excluirCategoria(Long id) {
+    public void excluirCategoria(UUID id) {
         Categoria categoria = buscarCategoria(id);
         validarCategoriaSemItens(id);
 
@@ -103,7 +104,7 @@ public class CategoriaService {
     /**
      * Verifica se já existe uma categoria com o mesmo nome.
      */
-    private void validarNomeUnico(String nome, Long idAtual) {
+    private void validarNomeUnico(String nome, UUID idAtual) {
         categoriaRepository.findByNome(nome).ifPresent(categoria -> {
             if (!categoria.getId().equals(idAtual)) {
                 throw new CategoriaJaExisteException(nome);
@@ -114,7 +115,7 @@ public class CategoriaService {
     /**
      * Busca uma categoria pelo ID e lança exceção se não for encontrada.
      */
-    private Categoria buscarCategoria(Long id) {
+    private Categoria buscarCategoria(UUID id) {
         return categoriaRepository.findById(id)
                 .orElseThrow(() -> new CategoriaNaoEncontradaException(id));
     }
@@ -122,7 +123,7 @@ public class CategoriaService {
     /**
      * Verifica se a categoria possui itens associados e lança exceção, se necessário.
      */
-    private void validarCategoriaSemItens(Long id) {
+    private void validarCategoriaSemItens(UUID id) {
         if (itemRepository.existsByCategoriaId(id)) {
             throw new CategoriaComItensException(id);
         }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Representa uma categoria de itens na lista de tarefas.
@@ -27,7 +28,7 @@ public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "ID único da categoria.", example = "1")
-    private Long id;
+    private UUID id;
 
     /**
      * Nome da categoria. Deve ser único e não pode ser nulo.

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -59,7 +60,7 @@ public class CategoriaController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "Buscar categoria por ID", description = "Retorna uma categoria específica com base no ID informado.")
-    public ResponseEntity<CategoriaDTO> buscarCategoriaPorId(@PathVariable Long id) {
+    public ResponseEntity<CategoriaDTO> buscarCategoriaPorId(@PathVariable UUID id) {
         CategoriaDTO categoriaDTO = categoriaService.buscarCategoriaPorId(id);
         return ResponseEntity.ok(categoriaDTO);
     }
@@ -74,7 +75,7 @@ public class CategoriaController {
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar categoria por ID", description = "Atualiza os dados de uma categoria existente.")
     public ResponseEntity<CategoriaDTO> atualizarCategoria(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody CategoriaDTO categoriaDTO) {
         CategoriaDTO categoriaAtualizada = categoriaService.atualizarCategoria(id, categoriaDTO);
         return ResponseEntity.ok(categoriaAtualizada);
@@ -88,7 +89,7 @@ public class CategoriaController {
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "Excluir categoria por ID", description = "Remove uma categoria existente pelo seu identificador.")
-    public ResponseEntity<Void> excluirCategoria(@PathVariable Long id) {
+    public ResponseEntity<Void> excluirCategoria(@PathVariable UUID id) {
         categoriaService.excluirCategoria(id);
         return ResponseEntity.noContent().build();
     }

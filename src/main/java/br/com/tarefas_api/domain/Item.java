@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Representa um item dentro de uma categoria.
@@ -26,7 +27,7 @@ public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "ID único do item.", example = "1")
-    private Long id;
+    private UUID id;
 
     /**
      * Descrição do item. Não pode ser nula.

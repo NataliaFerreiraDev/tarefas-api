@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Controlador responsável por expor os endpoints referentes aos itens da API REST.
@@ -57,7 +58,7 @@ public class ItemController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "Buscar item por ID", description = "Retorna um item específico com base no ID informado.")
-    public ResponseEntity<ItemDTO> buscarItemPorId(@PathVariable Long id) {
+    public ResponseEntity<ItemDTO> buscarItemPorId(@PathVariable UUID id) {
         ItemDTO item = itemService.buscarPorId(id);
         return ResponseEntity.ok(item);
     }
@@ -71,7 +72,7 @@ public class ItemController {
      */
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar item por ID", description = "Atualiza os dados de um item existente.")
-    public ResponseEntity<ItemDTO> atualizarItem(@PathVariable Long id, @Valid @RequestBody ItemDTO itemDTO) {
+    public ResponseEntity<ItemDTO> atualizarItem(@PathVariable UUID id, @Valid @RequestBody ItemDTO itemDTO) {
         ItemDTO itemAtualizado = itemService.atualizarItem(id, itemDTO);
         return ResponseEntity.ok(itemAtualizado);
     }
@@ -84,7 +85,7 @@ public class ItemController {
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "Excluir item por ID", description = "Remove um item existente pelo seu identificador.")
-    public ResponseEntity<Void> deletarItem(@PathVariable Long id) {
+    public ResponseEntity<Void> deletarItem(@PathVariable UUID id) {
         itemService.removerItem(id);
         return ResponseEntity.noContent().build();
     }

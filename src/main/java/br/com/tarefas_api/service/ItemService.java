@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 /**
  * Serviço responsável pela lógica de negócios da entidade Item.
@@ -51,7 +51,7 @@ public class ItemService {
      * @return DTO do item atualizado.
      */
     @Transactional
-    public ItemDTO atualizarItem(Long id, ItemDTO itemDTO) {
+    public ItemDTO atualizarItem(UUID id, ItemDTO itemDTO) {
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new ItemNaoEncontradoException(id));
 
@@ -75,7 +75,7 @@ public class ItemService {
         return itemRepository.findAll()
                 .stream()
                 .map(this::converterParaDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -83,7 +83,7 @@ public class ItemService {
      * @param id ID do item.
      * @return DTO do item encontrado.
      */
-    public ItemDTO buscarPorId(Long id) {
+    public ItemDTO buscarPorId(UUID id) {
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new ItemNaoEncontradoException(id));
 
@@ -95,7 +95,7 @@ public class ItemService {
      * @param id ID do item a ser removido.
      */
     @Transactional
-    public void removerItem(Long id) {
+    public void removerItem(UUID id) {
         if (!itemRepository.existsById(id)) {
             throw new ItemNaoEncontradoException(id);
         }

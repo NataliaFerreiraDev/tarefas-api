@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * DTO para transferência de dados do Item.
@@ -42,6 +43,6 @@ public class ItemDTO {
      */
     @NotNull(message = "A categoria do item é obrigatória.")
     @Schema(description = "ID da categoria associada ao item.", example = "1")
-    private Long categoriaId;
+    private UUID categoriaId;
 
 }

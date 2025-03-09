@@ -3,9 +3,9 @@ package br.com.tarefas_api.domain;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,7 +14,7 @@ import java.util.UUID;
  * Representa uma categoria de itens na lista de tarefas.
  */
 @Getter
-@Setter
+@Builder
 @Entity
 @Table(name = "categoria")
 @Schema(description = "Entidade que representa uma categoria.")

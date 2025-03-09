@@ -77,14 +77,19 @@ public class CategoriaService {
      */
     @Transactional
     public CategoriaDTO atualizarCategoria(UUID id, CategoriaDTO categoriaDTO) {
-        Categoria categoria = buscarCategoria(id);
+        Categoria categoriaExistente = buscarCategoria(id);
+
         validarCategoriaSemItens(id);
         validarNomeUnico(categoriaDTO.getNome(), id);
 
-        categoria.setNome(categoriaDTO.getNome());
-        Categoria atualizada = categoriaRepository.save(categoria);
+        Categoria categoriaAtualizada = Categoria.builder()
+                .id(categoriaExistente.getId())
+                .nome(categoriaDTO.getNome())
+                .build();
 
-        return converterParaDTO(atualizada);
+        categoriaRepository.save(categoriaAtualizada);
+
+        return converterParaDTO(categoriaAtualizada);
     }
 
     /**
@@ -133,16 +138,20 @@ public class CategoriaService {
      * Converte um DTO para a entidade Categoria.
      */
     private Categoria converterParaEntidade(CategoriaDTO dto) {
-        Categoria categoria = new Categoria();
-        categoria.setNome(dto.getNome());
-        return categoria;
+        return Categoria.builder()
+                .id(dto.getId())
+                .nome(dto.getNome())
+                .build();
     }
 
     /**
      * Converte uma entidade Categoria para DTO.
      */
     private CategoriaDTO converterParaDTO(Categoria categoria) {
-        return new CategoriaDTO(categoria.getNome());
+        return CategoriaDTO.builder()
+                .id(categoria.getId())
+                .nome(categoria.getNome())
+                .build();
     }
 
 }

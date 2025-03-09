@@ -34,7 +34,7 @@ class CategoriaControllerTest {
 
     @BeforeEach
     void setUp() {
-        categoriaDTO = new CategoriaDTO("Trabalho");
+        categoriaDTO = new CategoriaDTO(UUID.randomUUID(), "Trabalho");
         categoriaId = UUID.randomUUID();
     }
 

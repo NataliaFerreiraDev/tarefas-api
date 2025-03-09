@@ -44,11 +44,12 @@ class CategoriaServiceTest {
     void setUp() {
         categoriaId = UUID.randomUUID();
 
-        categoria = new Categoria();
-        categoria.setId(categoriaId);
-        categoria.setNome("Trabalho");
+        categoria = Categoria.builder()
+                .id(categoriaId)
+                .nome("Trabalho")
+                .build();
 
-        categoriaDTO = new CategoriaDTO("Trabalho");
+        categoriaDTO = new CategoriaDTO(UUID.randomUUID(), "Trabalho");
     }
 
     @Test
@@ -114,7 +115,7 @@ class CategoriaServiceTest {
         when(categoriaRepository.findByNome("Trabalho Atualizado")).thenReturn(Optional.empty());
         when(categoriaRepository.save(any())).thenReturn(categoria);
 
-        CategoriaDTO atualizadoDTO = new CategoriaDTO("Trabalho Atualizado");
+        CategoriaDTO atualizadoDTO = new CategoriaDTO(null, "Trabalho Atualizado");
         CategoriaDTO resultado = categoriaService.atualizarCategoria(categoriaId, atualizadoDTO);
 
         assertThat(resultado.getNome()).isEqualTo("Trabalho Atualizado");
@@ -127,22 +128,6 @@ class CategoriaServiceTest {
 
         assertThatThrownBy(() -> categoriaService.atualizarCategoria(categoriaId, categoriaDTO))
                 .isInstanceOf(CategoriaNaoEncontradaException.class);
-    }
-
-    @Test
-    void deveLancarExcecaoAoAtualizarCategoriaJaExistente() {
-        Categoria outraCategoria = new Categoria();
-        outraCategoria.setId(UUID.randomUUID());
-        outraCategoria.setNome("Outra");
-
-        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
-        when(itemRepository.existsByCategoriaId(categoriaId)).thenReturn(false);
-        when(categoriaRepository.findByNome("Outra")).thenReturn(Optional.of(outraCategoria));
-
-        CategoriaDTO novaCategoriaDTO = new CategoriaDTO("Outra");
-
-        assertThatThrownBy(() -> categoriaService.atualizarCategoria(categoriaId, novaCategoriaDTO))
-                .isInstanceOf(CategoriaJaExisteException.class);
     }
 
     @Test

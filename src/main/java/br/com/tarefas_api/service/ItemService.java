@@ -7,9 +7,11 @@ import br.com.tarefas_api.exception.CategoriaNaoEncontradaException;
 import br.com.tarefas_api.exception.ItemNaoEncontradoException;
 import br.com.tarefas_api.repository.CategoriaRepository;
 import br.com.tarefas_api.repository.ItemRepository;
+import br.com.tarefas_api.utils.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,41 +40,21 @@ public class ItemService {
         Categoria categoria = categoriaRepository.findById(itemDTO.getCategoriaId())
                 .orElseThrow(() -> new CategoriaNaoEncontradaException(itemDTO.getCategoriaId()));
 
-        Item item = converterParaEntidade(itemDTO, categoria);
-        Item salvo = itemRepository.save(item);
+        Item salvo = itemRepository.save(converterParaEntidade(itemDTO, categoria));
 
         return converterParaDTO(salvo);
     }
 
     /**
-     * Atualiza um item existente.
-     * @param id ID do item a ser atualizado.
-     * @param itemDTO DTO contendo os novos dados.
-     * @return DTO do item atualizado.
-     */
-    @Transactional
-    public ItemDTO atualizarItem(UUID id, ItemDTO itemDTO) {
-        Item item = itemRepository.findById(id)
-                .orElseThrow(() -> new ItemNaoEncontradoException(id));
-
-        Categoria categoria = categoriaRepository.findById(itemDTO.getCategoriaId())
-                .orElseThrow(() -> new CategoriaNaoEncontradaException(itemDTO.getCategoriaId()));
-
-        Item itemAtualizado = converterParaEntidade(itemDTO, categoria);
-        itemAtualizado.setId(item.getId());
-        itemAtualizado.setDataCriacao(item.getDataCriacao());
-
-        Item salvo = itemRepository.save(itemAtualizado);
-
-        return converterParaDTO(salvo);
-    }
-
-    /**
-     * Lista todos os itens.
+     * Lista os itens de uma categoria específica.
+     * @param idCategoria ID da categoria.
      * @return Lista de ItemDTOs.
      */
-    public List<ItemDTO> listarItens() {
-        return itemRepository.findAll()
+    public List<ItemDTO> listarItensDaCategoria(UUID idCategoria) {
+        Categoria categoria = categoriaRepository.findById(idCategoria)
+                .orElseThrow(() -> new CategoriaNaoEncontradaException(idCategoria));
+
+        return itemRepository.findByCategoriaId(categoria.getId())
                 .stream()
                 .map(this::converterParaDTO)
                 .toList();
@@ -88,6 +70,36 @@ public class ItemService {
                 .orElseThrow(() -> new ItemNaoEncontradoException(id));
 
         return converterParaDTO(item);
+    }
+
+    /**
+     * Atualiza um item existente.
+     * @param id ID do item a ser atualizado.
+     * @param itemDTO DTO contendo os novos dados.
+     * @return DTO do item atualizado.
+     */
+    @Transactional
+    public ItemDTO atualizarItem(UUID id, ItemDTO itemDTO) {
+        Item itemExistente = itemRepository.findById(id)
+                .orElseThrow(() -> new ItemNaoEncontradoException(id));
+
+        Categoria categoria = categoriaRepository.findById(itemExistente.getCategoria().getId())
+                .orElseThrow(() -> new CategoriaNaoEncontradaException(itemDTO.getCategoriaId()));
+
+        Item itemAtualizado = Item.builder()
+                .id(itemExistente.getId())
+                .descricao(itemDTO.getDescricao() != null ? itemDTO.getDescricao() : itemExistente.getDescricao())
+                .concluido(itemDTO.isConcluido())
+                .dataAtualizacao(LocalDateTime.now())
+                .dataLimite(itemDTO.getDataLimite() != null ? DateUtils.parseDate(itemDTO.getDataLimite()) : itemExistente.getDataLimite())
+                .categoria(categoria)
+                .build();
+
+        // Salva a entidade atualizada no banco
+        Item salvo = itemRepository.save(itemAtualizado);
+
+        // Retorna o DTO do item atualizado
+        return converterParaDTO(salvo);
     }
 
     /**
@@ -107,9 +119,12 @@ public class ItemService {
      */
     private Item converterParaEntidade(ItemDTO itemDTO, Categoria categoria) {
         return Item.builder()
+                .id(itemDTO.getId())
                 .descricao(itemDTO.getDescricao())
-                .concluido(itemDTO.getConcluido())
-                .dataLimite(itemDTO.getDataLimite())
+                .dataCriacao(LocalDateTime.now())
+                .concluido(itemDTO.isConcluido())
+                .dataAtualizacao(DateUtils.parseDate(itemDTO.getDataAtualizacao()))
+                .dataLimite(DateUtils.parseDate(itemDTO.getDataLimite()))
                 .categoria(categoria)
                 .build();
     }
@@ -119,9 +134,12 @@ public class ItemService {
      */
     private ItemDTO converterParaDTO(Item item) {
         return ItemDTO.builder()
+                .id(item.getId())
                 .descricao(item.getDescricao())
-                .concluido(item.getConcluido())
-                .dataLimite(item.getDataLimite())
+                .concluido(item.isConcluido())
+                .dataCriacao(DateUtils.formatDate(item.getDataCriacao()))
+                .dataAtualizacao(DateUtils.formatDate(item.getDataAtualizacao()))
+                .dataLimite(DateUtils.formatDate(item.getDataLimite()))
                 .categoriaId(item.getCategoria().getId())
                 .build();
     }

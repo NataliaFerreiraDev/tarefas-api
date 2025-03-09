@@ -7,6 +7,7 @@ import br.com.tarefas_api.exception.CategoriaNaoEncontradaException;
 import br.com.tarefas_api.exception.ItemNaoEncontradoException;
 import br.com.tarefas_api.repository.CategoriaRepository;
 import br.com.tarefas_api.repository.ItemRepository;
+import br.com.tarefas_api.utils.DateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -62,7 +63,7 @@ class ItemServiceTest {
         itemDTO = ItemDTO.builder()
                 .descricao("Finalizar relatório")
                 .concluido(false)
-                .dataLimite(LocalDate.of(2025, 12, 31).atStartOfDay())
+                .dataLimite(DateUtils.formatDate(LocalDate.of(2025, 12, 31).atStartOfDay()))
                 .categoriaId(categoriaId)
                 .build();
     }
@@ -108,9 +109,10 @@ class ItemServiceTest {
 
     @Test
     void listarItens_DeveRetornarListaDeItens() {
-        when(itemRepository.findAll()).thenReturn(List.of(item));
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+        when(itemRepository.findByCategoriaId(categoriaId)).thenReturn(List.of(item));
 
-        List<ItemDTO> resultado = itemService.listarItens();
+        List<ItemDTO> resultado = itemService.listarItensDaCategoria(categoriaId);
 
         assertFalse(resultado.isEmpty());
         assertEquals(1, resultado.size());

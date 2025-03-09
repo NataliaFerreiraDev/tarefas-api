@@ -11,7 +11,6 @@ import java.util.UUID;
  * Representa um item dentro de uma categoria.
  */
 @Getter
-@Setter
 @Entity
 @Builder
 @Table(name = "item")
@@ -42,14 +41,7 @@ public class Item {
     @Column(nullable = false)
     @Builder.Default
     @Schema(description = "Indica se o item foi concluído.", example = "false")
-    private Boolean concluido = false;
-
-    /**
-     * Data limite para conclusão do item.
-     */
-    @Column
-    @Schema(description = "Data limite para conclusão do item.", example = "2024-12-31T23:59:59")
-    private LocalDateTime dataLimite;
+    private boolean concluido = false;
 
     /**
      * Data de criação do item. Definida automaticamente na inserção.
@@ -59,19 +51,24 @@ public class Item {
     private LocalDateTime dataCriacao;
 
     /**
+     * Data de atualização do item. Definida na atualização.
+     */
+    @Schema(description = "Data de criação do item.", example = "2024-02-21T10:00:00")
+    private LocalDateTime dataAtualizacao;
+
+    /**
+     * Data limite para conclusão do item.
+     */
+    @Column
+    @Schema(description = "Data limite para conclusão do item.", example = "2024-12-31T23:59:59")
+    private LocalDateTime dataLimite;
+
+    /**
      * Categoria à qual o item pertence.
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoria_id", nullable = false)
     @Schema(description = "Categoria associada ao item.")
     private Categoria categoria;
-
-    /**
-     * Define automaticamente a data de criação antes de salvar no banco.
-     */
-    @PrePersist
-    protected void prePersist() {
-        this.dataCriacao = LocalDateTime.now();
-    }
 
 }

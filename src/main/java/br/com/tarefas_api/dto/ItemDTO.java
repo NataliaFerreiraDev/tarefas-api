@@ -1,22 +1,34 @@
 package br.com.tarefas_api.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
  * DTO para transferência de dados do Item.
  */
 @Getter
-@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ItemDTO {
+
+    /**
+     * Id do item. Campo opcional.
+     */
+    @Size(min = 5, message = "A descrição deve ter no mínimo 5 caracteres.")
+    @Schema(description = "Id do item.", example = "747ab89b-0e9e-4c21-aeda-36daec191de7")
+    private UUID id;
 
     /**
      * Descrição do item. Campo obrigatório.
@@ -28,15 +40,28 @@ public class ItemDTO {
     /**
      * Indica se o item foi concluído.
      */
-    @NotNull(message = "O status do item é obrigatório.")
     @Schema(description = "Indica se o item foi concluído.", example = "false")
-    private Boolean concluido;
+    private boolean concluido;
+
+    /**
+     * Data de criação do item.
+     */
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
+    @Schema(description = "Data de criação do item.", example = "09/03/2025 15:00")
+    private String dataCriacao;
+
+    /**
+     * Data de atualização do item. Campo opcional.
+     */
+    @Schema(description = "Data da atualização do item.", example = "09/03/2025 15:00")
+    private String dataAtualizacao;
 
     /**
      * Data limite para conclusão do item.
      */
-    @Schema(description = "Data limite para conclusão do item.", example = "2024-12-31T23:59:59")
-    private LocalDateTime dataLimite;
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
+    @Schema(description = "Data limite para conclusão do item.", example = "09/03/2025 15:00")
+    private String dataLimite;
 
     /**
      * ID da categoria associada ao item.

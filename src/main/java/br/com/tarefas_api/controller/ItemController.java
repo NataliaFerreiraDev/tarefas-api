@@ -5,6 +5,7 @@ import br.com.tarefas_api.service.ItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,18 +36,18 @@ public class ItemController {
     @Operation(summary = "Criar um novo item", description = "Cria e retorna um novo item cadastrado.")
     public ResponseEntity<ItemDTO> criarItem(@Valid @RequestBody ItemDTO itemDTO) {
         ItemDTO novoItem = itemService.criarItem(itemDTO);
-        return ResponseEntity.ok(novoItem);
+        return ResponseEntity.status(HttpStatus.CREATED).body(novoItem);
     }
 
     /**
-     * Lista todos os itens.
-     *
+     * Lista os itens de uma categoria específica.
+     * @param idCategoria ID da categoria.
      * @return ResponseEntity com a lista de itens e status 200 (OK).
      */
     @GetMapping
-    @Operation(summary = "Listar todos os itens", description = "Retorna todos os itens cadastrados.")
-    public ResponseEntity<List<ItemDTO>> listarItens() {
-        List<ItemDTO> itens = itemService.listarItens();
+    @Operation(summary = "Listar todos os itens de uma categoria", description = "Retorna todos os itens cadastrados de uma categoria específica")
+    public ResponseEntity<List<ItemDTO>> listarItens(@RequestParam UUID idCategoria) {
+        List<ItemDTO> itens = itemService.listarItensDaCategoria(idCategoria);
         return ResponseEntity.ok(itens);
     }
 

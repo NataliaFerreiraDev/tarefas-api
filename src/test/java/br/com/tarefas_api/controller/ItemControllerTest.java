@@ -2,6 +2,7 @@ package br.com.tarefas_api.controller;
 
 import br.com.tarefas_api.dto.ItemDTO;
 import br.com.tarefas_api.service.ItemService;
+import br.com.tarefas_api.utils.DateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,8 +40,7 @@ class ItemControllerTest {
 
         itemDTO = ItemDTO.builder()
                 .descricao("Finalizar relatório")
-                .concluido(false)
-                .dataLimite(java.time.LocalDateTime.now())
+                .dataLimite(DateUtils.formatDate(java.time.LocalDateTime.now()))
                 .categoriaId(categoriaId)
                 .build();
     }
@@ -51,7 +51,7 @@ class ItemControllerTest {
 
         ResponseEntity<ItemDTO> response = itemController.criarItem(itemDTO);
 
-        assertEquals(200, response.getStatusCode().value());
+        assertEquals(201, response.getStatusCode().value());
         assertEquals(itemDTO, response.getBody());
         verify(itemService, times(1)).criarItem(any(ItemDTO.class));
     }
@@ -59,13 +59,13 @@ class ItemControllerTest {
     @Test
     void listarItens_DeveRetornarListaDeItens() {
         List<ItemDTO> itens = Collections.singletonList(itemDTO);
-        when(itemService.listarItens()).thenReturn(itens);
+        when(itemService.listarItensDaCategoria(categoriaId)).thenReturn(itens);
 
-        ResponseEntity<List<ItemDTO>> response = itemController.listarItens();
+        ResponseEntity<List<ItemDTO>> response = itemController.listarItens(categoriaId);
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(itens, response.getBody());
-        verify(itemService, times(1)).listarItens();
+        verify(itemService, times(1)).listarItensDaCategoria(categoriaId);
     }
 
     @Test

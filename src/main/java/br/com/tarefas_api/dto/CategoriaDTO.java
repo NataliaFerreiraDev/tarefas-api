@@ -3,6 +3,7 @@ package br.com.tarefas_api.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,6 +30,7 @@ public class CategoriaDTO {
     /**
      * Nome da categoria. Campo obrigatório.
      */
+    @Size(min = 3, message = "O nome deve ter no mínimo 3 caracteres.")
     @NotBlank(message = "O nome da categoria é obrigatório.")
     @Schema(description = "Nome da categoria.", example = "Trabalho")
     private String nome;

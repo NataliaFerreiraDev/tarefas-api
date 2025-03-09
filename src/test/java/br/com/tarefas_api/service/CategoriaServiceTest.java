@@ -3,7 +3,7 @@ package br.com.tarefas_api.service;
 import br.com.tarefas_api.domain.Categoria;
 import br.com.tarefas_api.dto.CategoriaDTO;
 import br.com.tarefas_api.exception.CategoriaComItensException;
-import br.com.tarefas_api.exception.CategoriaJaExisteException;
+import br.com.tarefas_api.exception.CategoriaJaExistenteException;
 import br.com.tarefas_api.exception.CategoriaNaoEncontradaException;
 import br.com.tarefas_api.repository.CategoriaRepository;
 import br.com.tarefas_api.repository.ItemRepository;
@@ -66,11 +66,11 @@ class CategoriaServiceTest {
     }
 
     @Test
-    void deveLancarExcecaoQuandoCategoriaJaExiste() {
+    void deveLancarExcecaoQuandoCategoriaJaExistente() {
         when(categoriaRepository.findByNome("Trabalho")).thenReturn(Optional.of(categoria));
 
         assertThatThrownBy(() -> categoriaService.criarCategoria(categoriaDTO))
-                .isInstanceOf(CategoriaJaExisteException.class)
+                .isInstanceOf(CategoriaJaExistenteException.class)
                 .hasMessage("Já existe uma categoria com o nome: Trabalho");
 
         verify(categoriaRepository, never()).save(any());

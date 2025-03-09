@@ -3,7 +3,7 @@ package br.com.tarefas_api.service;
 import br.com.tarefas_api.domain.Categoria;
 import br.com.tarefas_api.dto.CategoriaDTO;
 import br.com.tarefas_api.exception.CategoriaComItensException;
-import br.com.tarefas_api.exception.CategoriaJaExisteException;
+import br.com.tarefas_api.exception.CategoriaJaExistenteException;
 import br.com.tarefas_api.exception.CategoriaNaoEncontradaException;
 import br.com.tarefas_api.repository.CategoriaRepository;
 import br.com.tarefas_api.repository.ItemRepository;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -35,7 +36,7 @@ public class CategoriaService {
      */
     @Transactional
     public CategoriaDTO criarCategoria(CategoriaDTO categoriaDTO) {
-        validarNomeUnico(categoriaDTO.getNome(), null);
+        validarNomeUnico(categoriaDTO.getNome());
 
         Categoria categoria = converterParaEntidade(categoriaDTO);
         Categoria salva = categoriaRepository.save(categoria);
@@ -80,7 +81,7 @@ public class CategoriaService {
         Categoria categoriaExistente = buscarCategoria(id);
 
         validarCategoriaSemItens(id);
-        validarNomeUnico(categoriaDTO.getNome(), id);
+        validarNomeUnico(categoriaDTO.getNome());
 
         Categoria categoriaAtualizada = Categoria.builder()
                 .id(categoriaExistente.getId())
@@ -109,12 +110,11 @@ public class CategoriaService {
     /**
      * Verifica se já existe uma categoria com o mesmo nome.
      */
-    private void validarNomeUnico(String nome, UUID idAtual) {
-        categoriaRepository.findByNome(nome).ifPresent(categoria -> {
-            if (!categoria.getId().equals(idAtual)) {
-                throw new CategoriaJaExisteException(nome);
-            }
-        });
+    private void validarNomeUnico(String nome) {
+        Optional<Categoria> categoriaExistente = categoriaRepository.findByNome(nome);
+        if (categoriaExistente.isPresent()) {
+            throw new CategoriaJaExistenteException(nome);
+        }
     }
 
     /**
